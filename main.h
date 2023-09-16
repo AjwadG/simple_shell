@@ -9,22 +9,36 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 
+/**
+ * struct list - struct
+ * @env: evirument value
+ * @next: pointer to next node
+ */
+typedef struct list
+{
+	char *env;
+	struct list *next;
+} node;
+
 extern char **environ;
 
-void handle_terminal(char *name);
-void handle_echo(char *name);
+void handle_terminal(char *name, node **env);
+void handle_echo(char *name, node **env);
 int isempty(char *s);
 char **get_arg(char *s, char *dil);
 int count_w(char *s);
 char *get_path(char *s);
-int print_env(void);
+int print_env(node *env);
 int _getline(char **s, int *l, int stream);
 void exit_with(char *code);
 char *_strtok(char *str, char *dilm);
-int _setenv(char *name, char *value);
-int _unsetenv(char *env_name);
-
-
+int _setenv(node **env, char *name, char *value);
+int _unsetenv(char *env_name, node **env);
+void free_env(node *env_head);
+node *build_env(char **env);
+int envcmp(char *env, char *s);
+int is_env(char *var);
+int add_node(node **head, char *env_value);
 
 
 char *str_concat(char *s1, char *s2);

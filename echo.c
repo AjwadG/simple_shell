@@ -23,9 +23,9 @@ char **get_arg(char *s, char *dil)
 /**
  * handle_echo - handles the input from echo
  * @name: name of the file
+ * @env: list of envs
  */
-
-void handle_echo(char *name)
+void handle_echo(char *name, node **env)
 {
 	char *s = NULL, **arg;
 	pid_t pid;
@@ -44,11 +44,17 @@ void handle_echo(char *name)
 			exit_with(arg[1]);
 			continue;
 		}
-		else if (_strcmp(arg[0], "env") == 0 && print_env())
+		else if (_strcmp(arg[0], "env") == 0 && print_env(*env))
 			continue;
-		else if (_strcmp(arg[0], "setenv") == 0 && _setenv(arg[1], arg[2]))
+		else if (_strcmp(arg[0], "setenv") == 0)
+		{
+			if (arg[1] && arg[2])
+				_setenv(env, arg[1], arg[2]);
+			else
+				write(STDOUT_FILENO, "wrong usage\n", 12);
 			continue;
-		else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1]))
+		}
+		else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1], env))
 			continue;
 		arg[0] = get_path(s);
 		if (arg[0] == NULL)
@@ -101,8 +107,42 @@ void exit_with(char *code)
 }
 
 /**
+ * _unsetenv - removes env
+ *
+ * @env_name: env name to remove
+ * @env: head of env list
+ *
+ * Return: 1 on succes 0 other wise
  */
-int _unsetenv(char *env_name)
+int _unsetenv(char *env_name, node **env)
 {
+	node *tmp = *env, *tmp1 = tmp;
+
+	if(!env_name)
+	{
+		write(STDOUT_FILENO, "unset wrong usage\n", 18);
+		return(1);
+	}
+
+	if (envcmp(tmp->env, env_name))
+	{
+		*env = tmp->next;
+		free(tmp->env);
+		free(tmp);
+		return (1);
+	}
+
+	while (tmp)
+	{
+		if (envcmp(tmp->env, env_name))
+		{
+			free(tmp->env);
+			tmp1->next = tmp->next;
+			free(tmp);
+			return (1);
+		}
+		tmp1 = tmp;
+		tmp = tmp->next;
+	}
 	return (1);
 }

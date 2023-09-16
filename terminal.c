@@ -5,9 +5,10 @@
 /**
  * handle_terminal - handles the input from echo
  * @name: name of the file
+ * @env: list of envs
  */
 
-void handle_terminal(char *name)
+void handle_terminal(char *name, node **env)
 {
 	char *s = malloc(1), **arg;
 	pid_t pid;
@@ -32,11 +33,17 @@ void handle_terminal(char *name)
 			exit_with(arg[1]);
 			continue;
 		}
-		else if (_strcmp(arg[0], "env") == 0 && print_env())
+		else if (_strcmp(arg[0], "env") == 0 && print_env(*env))
 			continue;
-		else if (_strcmp(arg[0], "setenv") == 0 && _setenv(arg[1], arg[2]))
+		else if (_strcmp(arg[0], "setenv") == 0)
+		{
+			if (arg[1] && arg[2])
+				_setenv(env, arg[1], arg[2]);
+			else
+				write(STDOUT_FILENO, "wrong usage\n", 12);
 			continue;
-		else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1]))
+		}
+		else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1], env))
 			continue;
 		arg[0] = get_path(s);
 		if (arg[0] == NULL)
@@ -54,22 +61,6 @@ void handle_terminal(char *name)
 	}
 }
 
-
-/**
- * print_env - prints current env
- * Return: allways 1
- */
-int print_env(void)
-{
-	int i;
-
-	for (i = 0; environ[i]; i++)
-	{
-		write(STDOUT_FILENO, environ[i], len(environ[i]));
-		write(STDOUT_FILENO, "\n", 1);
-	}
-	return (1);
-}
 
 /**
  * get_path - cheks if the comand is in path
@@ -119,8 +110,40 @@ char *get_path(char *s)
 }
 
 /**
+ * _setenv - set a new env
+ *
+ * @env: pointer to ehad of struct
+ * @name: name of env
+ * @value: value of env
+ *
+ * Return: allways 1
  */
-int _setenv(char *name, char *value)
+int _setenv(node **env, char *name, char *value)
 {
+	node *tmp = *env;
+	char *s, *s1;
+
+	if (!name || is_env(name) || !value)
+	{
+		write(STDOUT_FILENO, "VARIABLE contains =\n",
+				len("VARIABLE contains =\n"));
+		return (0);
+	}
+
+	s = str_concat(name, "=");
+	s1 = str_concat(s, value);
+	free(s);
+	while (tmp)
+	{
+		if (envcmp(tmp->env, name))
+		{
+			free(tmp->env);
+			tmp->env = s1;
+			return (1);
+		}
+		tmp = tmp->next;
+	}
+	add_node(env, s1);
+	free(s1);
 	return (1);
 }

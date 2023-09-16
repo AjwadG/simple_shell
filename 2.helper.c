@@ -13,7 +13,7 @@ char *_strtok(char *str, char *dilm)
 {
 	static char *token;
 
-	int last, next, i, j, c_count = 0;
+	int last, next = 0, i, j, c_count = 0;
 
 	if (str)
 		token = str;
@@ -30,6 +30,9 @@ char *_strtok(char *str, char *dilm)
 			}
 		}
 	}
+	last = next + c_count;
+	next = last;
+	return (NULL);
 }
 /**
  * count_w - counts the number of words
