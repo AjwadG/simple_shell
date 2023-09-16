@@ -2,14 +2,14 @@
 
 
 /**
- * _strtok - gets the tokens from string
+ * _strtok1 - gets the tokens from string
  *
  * @str: pointer to string or NULL
  * @dilm: char to split the string on
  *
  * Return: pointer to the new token
  */
-char *_strtok(char *str, char *dilm)
+char *_strtok1(char *str, char *dilm)
 {
 	static char *token;
 

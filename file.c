@@ -69,3 +69,39 @@ void handle_file(char **av, node **env)
 		wait(&status);
 	}
 }
+
+/**
+ * built_in - ex built in fun
+ *
+ * @env: env linked list
+ * @arg: comands and thir args
+ * @ali: alias list
+ *
+ * Return: 1 if built in 0 otehr wise
+ */
+int built_in(node **env, char **arg, char ***ali)
+{
+	if (_strcmp(arg[0], "exit") == 0)
+	{
+		exit_with(arg[1]);
+		return (1);
+	}
+	if (_strcmp(arg[0], "env") == 0 && print_env(*env))
+		return (1);
+	if (_strcmp(arg[0], "cd") == 0 && cd(env, arg[1]))
+		return (1);
+	if (_strcmp(arg[0], "alias") == 0 && alias(env, &arg[1], ali))
+		return (1);
+	if (_strcmp(arg[0], "setenv") == 0)
+	{
+		if (arg[1] && arg[2])
+			_setenv(env, arg[1], arg[2]);
+		else
+			write(STDOUT_FILENO, "wrong usage\n", 12);
+		return (1);
+	}
+	else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1], env))
+		return (1);
+
+	return (0);
+}

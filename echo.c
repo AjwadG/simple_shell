@@ -8,56 +8,53 @@
  */
 void handle_echo(char *name, node **env)
 {
-	char *s = NULL, **arg, **ali = NULL;
+	char *s = NULL, **arg = NULL, ***args = NULL, **ali = NULL, seq[10];
 	pid_t pid;
-	int status, len, size;
+	int status, len, size, i;
 
 	while (1)
 	{
 		len = _getline(&s, &size, STDIN_FILENO);
-		if (len == EOF || len == 0)
+		printf("%s \n", s);
+		if (len == 0)
+		{
+			free_arg(args);
+			free_env(*env);
+			free_arr(ali);
 			return;
+		}
+		if (len == EOF)
+			continue;
 		else if (isempty(s))
 			continue;
-		arg = get_arg(s, " \n");
-		if (_strcmp(arg[0], "exit") == 0)
+		free_arg(args);
+		args = _strtok(s, seq);
+		for (i = 0; args[i]; i++)
 		{
-			exit_with(arg[1]);
-			continue;
-		}
-		else if (_strcmp(arg[0], "env") == 0 && print_env(*env))
-			continue;
-		else if (_strcmp(arg[0], "cd") == 0 && cd(env, arg[1]))
-			continue;
-		else if (_strcmp(arg[0], "alias") == 0 && alias(env, &arg[1], &ali))
-			continue;
-		else if (_strcmp(arg[0], "setenv") == 0)
-		{
-			if (arg[1] && arg[2])
-				_setenv(env, arg[1], arg[2]);
-			else
-				write(STDOUT_FILENO, "wrong usage\n", 12);
-			continue;
-		}
-		else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1], env))
-			continue;
-		arg[0] = get_path(s);
-		if (arg[0] == NULL)
-		{
-			perror(s);
-			continue;
-		}
-		pid = fork();
-		if (pid == 0)
-		{
-			if (execve(arg[0], arg, environ) == -1)
+			arg = args[i];
+			if (arg[0] == NULL)
+				break;
+			if (built_in(env, arg, &ali))
+				continue;
+			arg[0] = get_path(arg[0]);
+			if (arg[0] == NULL)
+			{
+				perror(arg[0]);
+				arg[0] = malloc(1);
+				continue;
+			}
+			pid = fork();
+			if (pid == 0 && execve(arg[0], arg, environ) == -1)
 			{
 				perror(name);
+				free_arg(args);
+				free_env(*env);
+				free_arr(ali);
+				free(s);
 				return;
 			}
+			wait(&status);
 		}
-		wait(&status);
-		free(arg);
 	}
 }
 
@@ -82,13 +79,12 @@ void exit_with(char *code)
 			_memcpy(s, exi, len(exi) - 1);
 			_memcpy(&s[len(exi) - 1], code, len(code) - 1);
 			_memcpy(&s[len(exi) + len(code) - 2], "\n", 2);
-
 			write(STDERR_FILENO, s, len(s));
 			return;
 		}
-		sum = sum * 10 + code[0] - '0';
+		sum = sum * 10 + code[i] - '0';
 	}
-	exit(sum);
+	exit(sum % 256);
 }
 
 /**

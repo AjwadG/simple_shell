@@ -10,9 +10,9 @@
 
 void handle_terminal(char *name, node **env)
 {
-	char *s = malloc(1), **arg, **ali = NULL;
+	char *s = NULL, **arg = NULL, ***args = NULL, **ali = NULL, seq[10];
 	pid_t pid;
-	int status, len, size;
+	int status, len, size, i;
 
 	while (1)
 	{
@@ -20,48 +20,47 @@ void handle_terminal(char *name, node **env)
 		len = _getline(&s, &size, STDIN_FILENO);
 		if (len == 0)
 		{
-			write(STDOUT_FILENO, "\n", 1);
+			free_arg(args);
+			free_env(*env);
+			free_arr(ali);
 			return;
 		}
 		if (len == EOF)
-			return;
+			continue;
 		else if (isempty(s))
 			continue;
-		arg = get_arg(s, " \n");
-		if (_strcmp(arg[0], "exit") == 0)
+		free_arg(args);
+		args = _strtok(s, seq);
+		for (i = 0; args[i]; i++)
 		{
-			exit_with(arg[1]);
-			continue;
+			arg = args[i];
+			if (arg[0] == NULL)
+				break;
+			if (built_in(env, arg, &ali))
+				continue;
+			arg[0] = get_path(arg[0]);
+			if (arg[0] == NULL)
+			{
+				perror(arg[0]);
+				arg[0] = malloc(1);
+				continue;
+			}
+			pid = fork();
+			if (pid == 0 && execve(arg[0], arg, environ) == -1)
+			{
+				perror(name);
+				free_arg(args);
+				free_env(*env);
+				free_arr(ali);
+				free(s);
+				exit(1);
+			}
+			wait(&status);
+			if (!status && seq[i] == '|')
+				break;
+			else if (status && seq[i] == '&')
+				break;
 		}
-		else if (_strcmp(arg[0], "env") == 0 && print_env(*env))
-			continue;
-		else if (_strcmp(arg[0], "cd") == 0 && cd(env, arg[1]))
-			continue;
-		else if (_strcmp(arg[0], "alias") == 0 && alias(env, &arg[1], &ali))
-			continue;
-		else if (_strcmp(arg[0], "setenv") == 0)
-		{
-			if (arg[1] && arg[2])
-				_setenv(env, arg[1], arg[2]);
-			else
-				write(STDOUT_FILENO, "wrong usage\n", 12);
-			continue;
-		}
-		else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1], env))
-			continue;
-		arg[0] = get_path(s);
-		if (arg[0] == NULL)
-		{
-			perror(s);
-			continue;
-		}
-		pid = fork();
-		if (pid == 0 && execve(arg[0], arg, environ) == -1)
-		{
-			perror(name);
-			return;
-		}
-		wait(&status);
 	}
 }
 
@@ -75,7 +74,7 @@ void handle_terminal(char *name, node **env)
  */
 char *get_path(char *s)
 {
-	char *path, *tmp, *token;
+	char *path, *tmp, *token, *tmp1;
 	int i;
 	struct stat st;
 
@@ -91,7 +90,9 @@ char *get_path(char *s)
 			break;
 		}
 	}
-	s = str_concat("/", s);
+	tmp1 = str_concat("/", s);
+	free(s);
+	s = tmp1;
 	token = strtok(path, ":\n");
 	while (token)
 	{

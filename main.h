@@ -34,7 +34,9 @@ char *get_path(char *s);
 int print_env(node *env);
 int _getline(char **s, int *l, int stream);
 void exit_with(char *code);
-char *_strtok(char *str, char *dilm);
+
+char *_strtok1(char *str, char *dilm);
+
 int _setenv(node **env, char *name, char *value);
 int _unsetenv(char *env_name, node **env);
 void free_env(node *env_head);
@@ -49,8 +51,14 @@ void set_env(node *env, char *value, char *name);
 int alias(node **env, char **arg, char ***ali);
 int put_alias(char *new_ali, char ***ali);
 char *get_alias(char *name, char **ali);
-int free_alias(char **ali);
+int free_arr(char **ar);
 
+int *arg_num(char *s, char seq[]);
+char ***_strtok(char *s, char seq[]);
+char *get_next_arg(char *s, int *k);
+int free_arg(char ***ar);
+
+int built_in(node **env, char **arg, char ***ali);
 
 
 char *str_concat(char *s1, char *s2);

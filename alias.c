@@ -36,7 +36,6 @@ int alias(node **env, char **arg, char ***ali)
 		{
 			put_alias(arg[i], ali);
 			printf("alias : %s was addid\n", ali[0][i]);
-			break;
 		}
 		else
 		{
@@ -108,27 +107,27 @@ char *get_alias(char *name, char **ali)
 	{
 		if (envcmp(ali[i], name))
 			return (ali[i]);
+		i++;
 	}
 	return (NULL);
 }
 
 
 /**
- * free_alias - free alias list
- * @ali: array fo alias
- * Return: always 1
+ * free_arr - frees array
+ * @ar: pointer to array
+ * Return: allways 1
  */
-int free_alias(char **ali)
+int free_arr(char **ar)
 {
-	int i = 0;
+	int i;
 
-	if (!ali)
+	if (!ar)
 		return (1);
-	while (ali[i])
+	for (i = 0; ar[i]; i++)
 	{
-		free(ali[i]);
-		i++;
+		free(ar[i]);
 	}
-	free(ali);
+	free(ar);
 	return (1);
 }
