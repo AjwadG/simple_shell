@@ -21,11 +21,41 @@ typedef struct list
 	struct list *next;
 } node;
 
+/**
+ * struct all - struct
+ * @envs: pointer to env array
+ * @args: pointer to array of pointers of args
+ * @env: pointer to head of env list
+ * @count: the number that the
+ * @s: the string that stores input
+ * @status: last exit stat
+ * @seq: seq of comands
+ * @ali: array of alias
+ * @name: name of the file
+ * @com: name of the comand
+ * @fd: file descreptor if any
+ */
+typedef struct all
+{
+	char **envs;
+	char ***args;
+	node *env;
+	int count;
+	char *s;
+	int status;
+	char seq[10];
+	char **ali;
+	char *name;
+	char *com;
+	int fd;
+} all_t;
+
+
 extern char **environ;
 
-void handle_terminal(char *name, node **env);
-void handle_echo(char *name, node **env);
-void handle_file(char **arg, node **env);
+void handle_terminal(all_t *a);
+void handle_echo(all_t *a);
+void handle_file(all_t *a);
 
 
 int isempty(char *s);
@@ -34,9 +64,12 @@ int count_w(char *s);
 char *get_path(char *PATH, char *s);
 int print_env(node *env);
 int _getline(char **s, int *l, int stream);
-void exit_with(char *code);
+int exit_with(char *code, all_t *a);
 
-char *_strtok1(char *str, char *dilm);
+
+void args_loop(all_t *a);
+
+
 
 int _setenv(node **env, char *name, char *value);
 int _unsetenv(char *env_name, node **env);
@@ -45,7 +78,16 @@ node *build_env(char **env);
 int envcmp(char *env, char *s);
 int is_env(char *var);
 int add_node(node **head, char *env_value);
-int cd(node **env, char *dir);
+
+
+
+
+int cd(char *dir, all_t *a);
+void cd_error(char *dir, all_t *a);
+char *_strtok1(char *s, int *k);
+
+
+
 char *env_val(node *env, char *name);
 node *get_node(node *env, char *name);
 void set_env(node *env, char *value, char *name);
@@ -63,9 +105,9 @@ char *ali_val(char **ali, char *name);
 char *build_ali(char *ali, char *val);
 void print_alias(char *ali);
 
+void free_all(all_t *a);
 
-
-int built_in(node **env, char **arg, char ***ali, int n);
+int built_in(char **arg, all_t *a);
 void print_err(char *name, int n, char *com);
 void nto_string(int n, char *s);
 

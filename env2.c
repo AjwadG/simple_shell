@@ -79,6 +79,8 @@ node *get_node(node *env, char *name)
  */
 void set_env(node *env, char *value, char *name)
 {
+	if (!env)
+		return;
 	free(env->env);
 	env->env = str_concat(name, value);
 }

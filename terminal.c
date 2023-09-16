@@ -4,62 +4,32 @@
 
 /**
  * handle_terminal - handles the input from echo
- * @name: name of the file
- * @env: list of envs
+ *
+ * @a: struct conatins all var needed to pass
+ *
  */
 
-void handle_terminal(char *name, node **env)
+void handle_terminal(all_t *a)
 {
-	char *s = NULL, ***args = NULL, **ali = NULL, seq[10], **envs = NULL;
-	pid_t pid;
-	int status, len, size, i, count = 0;
+	size_t len, size = 0;
 
-	while (++count)
+	for (a->count = 1; a->count; a->count++, size = 0)
 	{
+		if (a->s)
+			free(a->s);
+		a->s = NULL;
 		write(STDOUT_FILENO, "$ ", 2);
-		len = _getline(&s, &size, STDIN_FILENO);
-		if (len == 0)
+		len = getline(&a->s, &size, stdin);
+		if (len == 0 || len == (size_t) EOF)
 		{
-			free_arg(args);
-			free_env(*env);
-			free_arr(ali);
-			free(envs);
-			return;
+			free_all(a);
+			exit(a->status);
 		}
-		if (len == EOF || isempty(s))
+		if (isempty(a->s))
 			continue;
-		free_arg(args);
-		args = _strtok(s, seq);
-		for (i = 0; args[i]; i++)
-		{
-			if (args[i][0] == NULL)
-				break;
-			if (built_in(env, args[i], &ali, count))
-				continue;
-			args[i][0] = get_path(env_val(*env, "PATH"), args[i][0]);
-			if (list_arr(*env, &envs) && args[i][0] == NULL)
-			{
-				print_err(name, count, args[i][0]);
-				args[i][0] = malloc(1);
-				continue;
-			}
-			pid = fork();
-			if (pid == 0 && execve(args[i][0], args[i], envs) == -1)
-			{
-				perror(name);
-				free_arg(args);
-				free_env(*env);
-				free_arr(ali);
-				free(s);
-				free(envs);
-				exit(1);
-			}
-			wait(&status);
-			if (!status && seq[i] == '|')
-				break;
-			else if (status && seq[i] == '&')
-				break;
-		}
+		free_arg(a->args);
+		a->args = _strtok(a->s, a->seq);
+		args_loop(a);
 	}
 }
 
@@ -75,20 +45,24 @@ void handle_terminal(char *name, node **env)
 char *get_path(char *PATH, char *s)
 {
 	char *path, *tmp, *token, *tmp1;
-	int i;
 	struct stat st;
+	int k = 0;
 
-	if (stat(s, &st) == 0)
+	if (stat(s, &st) == 0 && (s[0] == '.' || s[0] == '/'))
 		return (s);
 
+	if (!PATH)
+	{
+		free(s);
+		return (NULL);
+	}
 	path = _strdup(PATH);
-
 	tmp1 = str_concat("/", s);
 	free(s);
 	s = tmp1;
-	token = strtok(path, ":\n");
-	while (token)
+	while (path[k] && path[k] != '\n')
 	{
+		token = _strtok1(path, &k);
 		if (token[len(token) - 2] == '/')
 			tmp = str_concat(token, &s[1]);
 		else
@@ -97,14 +71,37 @@ char *get_path(char *PATH, char *s)
 		{
 			free(path);
 			free(s);
+			free(token);
 			return (tmp);
 		}
-		token = strtok(NULL, ":\n");
 		free(tmp);
+		free(token);
 	}
 	free(path);
 	free(s);
 	return (NULL);
+}
+
+/**
+ * free_all - free all slocated var
+ * @a: pointer to all struct
+ */
+void free_all(all_t *a)
+{
+	if (a->args)
+		free_arg(a->args);
+	if (a->env)
+		free_env(a->env);
+	if (a->ali)
+		free_arr(a->ali);
+	if (a->envs)
+		free(a->envs);
+	if (a->s)
+		free(a->s);
+	if (a->com)
+		free(a->com);
+	if (a->fd)
+		close(a->fd);
 }
 
 /**
@@ -123,8 +120,6 @@ int _setenv(node **env, char *name, char *value)
 
 	if (!name || is_env(name) || !value)
 	{
-		write(STDOUT_FILENO, "VARIABLE contains =\n",
-				len("VARIABLE contains =\n"));
 		return (0);
 	}
 

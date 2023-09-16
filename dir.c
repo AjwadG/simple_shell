@@ -3,40 +3,79 @@
 /**
  * cd - changes dir
  *
- * @env: env list header
  * @dir: directory to move to
+ * @a: pointer to all struct
  *
  * Return: 1 on success 0 otehr wise
  */
-int cd(node **env, char *dir)
+int cd(char *dir, all_t *a)
 {
-	int stat;
-	char *path, *buff = NULL;
-	node *pwd = get_node(*env, "PWD");
-	node *opwd = get_node(*env, "OLDPWD");
+	int stat = 0;
+	char *path = NULL, *buff = NULL;
+	node *pwd = get_node(a->env, "PWD");
+	node *opwd = get_node(a->env, "OLDPWD");
 
 	if (!dir)
-		stat = chdir(env_val(*env, "HOME"));
+	{
+		path = env_val(a->env, "HOME");
+		if (path != NULL)
+			stat = chdir(path);
+	}
 	else if (_strcmp(dir, "-") == 0)
-		stat = chdir(env_val(*env, "OLDPWD"));
+	{
+		path = env_val(a->env, "OLDPWD");
+		if (path != NULL)
+			stat = chdir(path);
+		else
+			path = env_val(a->env, "PWD");
+		write(STDOUT_FILENO, path, len(path) - 1);
+		write(STDOUT_FILENO, "\n", 1);
+	}
 	else
 		stat = chdir(dir);
 	if (stat)
 	{
-		perror("cd failled");
+		cd_error(dir, a);
 		return (1);
 	}
 	path = getcwd(buff, 0);
 	if (!path)
 	{
 		free(buff);
-		perror("path failled");
 		return (1);
 	}
-	set_env(opwd, env_val(*env, "PWD"), "OLDPWD=");
+	set_env(opwd, env_val(a->env, "PWD"), "OLDPWD=");
 	set_env(pwd, path, "PWD=");
 	free(buff);
 	free(path);
 	return (1);
 }
 
+
+/**
+ * cd_error - prints cd errors
+ *
+ * @dir: name od directory
+ * @a: pointer to all struct
+ */
+void cd_error(char *dir, all_t *a)
+{
+	char s[1024], *num, *err = "cd: can't cd to ";
+	int l;
+
+	_memcpy(s, a->name, len(a->name) - 1);
+	_memcpy(&s[len(a->name) - 1], ": ", 2);
+	num = malloc(10);
+	nto_string(a->count, num);
+	_memcpy(&s[len(a->name) + 1], num, len(num) - 1);
+	l = len(a->name) + 1 + len(num) + 2;
+	_memcpy(&s[l - 3], ": ", 2);
+	_memcpy(&s[l - 1], err, len(err) - 1);
+	_memcpy(&s[l + len(err) - 2], dir, len(dir) - 1);
+	_memcpy(&s[l + len(err) + len(dir) - 3], "\n", 2);
+	write(STDERR_FILENO, s, len(s) - 1);
+	fflush(stderr);
+	free(num);
+	a->status = 0;
+
+}

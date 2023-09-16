@@ -49,7 +49,9 @@ char *get_next_arg(char *s, int *k)
 		{
 			if (s[j] == ' ' || s[j] == ';' || s[j] == '&')
 				break;
-			if (s[j] == '#' || s[j] == '|' || s[j] == '\n')
+			if (s[j] == '|' || s[j] == '\n')
+				break;
+			if (s[j] == '#' && (!j || s[j - 1] == ' '))
 				break;
 		}
 		l = j - i;
@@ -73,14 +75,11 @@ char *get_next_arg(char *s, int *k)
  */
 int *arg_num(char *s, char seq[10])
 {
-	int *n = malloc(sizeof(int) * 10), i = 0, start = 0;
+	int *n = malloc(sizeof(int) * 10), i = 0, start = s[0] == ' ' ? 1 : 0;
 
 	n[0] = 1;
 	while (++i < 10)
 		n[i] = 0;
-	if (s[0] == ' ')
-		start = 1;
-
 	for (i = 0; s[i] && s[i] != '\n'; i++)
 	{
 		if (s[i] == ';' && s[i + 1] != ';' && s[i - 1] != ';')
@@ -98,7 +97,7 @@ int *arg_num(char *s, char seq[10])
 			seq[n[0] - 1] = '|';
 			n[0]++;
 		}
-		else if (s[i] == '#')
+		else if (s[i] == '#' && (!i || s[i - 1] == ' '))
 			break;
 		else if ((s[i] == '&' || s[i] == '|') && s[i + 1] == ' ')
 			continue;
@@ -108,10 +107,9 @@ int *arg_num(char *s, char seq[10])
 				start = 0;
 			if (start)
 				continue;
-			else if (s[i] != ' ' && (s[i + 1] == ' '
-				|| s[i + 1] == '\n' || s[i + 1] == '\0'
-				|| s[i + 1] == ';' || s[i + 1] == '&'
-				|| s[i + 1] == '|'))
+			else if (s[i] != ' ' && (s[i + 1] == ' ' || s[i + 1]
+				== '\n' || s[i + 1] == '\0' || s[i + 1] == ';'
+				|| s[i + 1] == '&' || s[i + 1] == '|'))
 				n[n[0]]++;
 		}
 	}

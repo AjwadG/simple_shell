@@ -4,105 +4,65 @@
 
 /**
  * handle_file - handles the input from file arg[1]
- * @av: list of args
- * @env: list of envs
+ *
+ * @a: struct conatins all var needed to pass
  */
 
-void handle_file(char **av, node **env)
+void handle_file(all_t *a)
 {
-	char *s = malloc(1), **arg, **ali = NULL;
-	pid_t pid;
-	int status, len, size, fd = open(av[1], O_RDONLY);
+	size_t len, size = 0;
 
-	if (fd == -1)
+	for (a->count = 1; a->count; a->count++)
 	{
-		perror(av[1]);
-		exit(-1);
-	}
-
-	while (1)
-	{
-		len = _getline(&s, &size, fd);
-		if (len == 0)
+		if (a->s)
+			free(a->s);
+		a->s = NULL;
+		size = 0;
+		len = getline(&a->s, &size, stdin);
+		if (len <= 0)
 		{
-			write(STDOUT_FILENO, "\n", 1);
-			return;
+			free_all(a);
+			exit(a->status);
 		}
-		if (len == EOF)
-			return;
-		else if (isempty(s))
+		if (isempty(a->s))
 			continue;
-		arg = get_arg(s, " \n");
-		if (_strcmp(arg[0], "exit") == 0)
-		{
-			exit_with(arg[1]);
-			continue;
-		}
-		else if (_strcmp(arg[0], "env") == 0 && print_env(*env))
-			continue;
-		else if (_strcmp(arg[0], "cd") == 0 && cd(env, arg[1]))
-			continue;
-		else if (_strcmp(arg[0], "alias") == 0 && alias(env, &arg[1], &ali))
-			continue;
-		else if (_strcmp(arg[0], "setenv") == 0)
-		{
-			if (arg[1] && arg[2])
-				_setenv(env, arg[1], arg[2]);
-			else
-				write(STDOUT_FILENO, "wrong usage\n", 12);
-			continue;
-		}
-		else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1], env))
-			continue;
-		arg[0] = get_path(env_val(*env, "PATH"), arg[0]);
-		if (arg[0] == NULL)
-		{
-			perror(s);
-			continue;
-		}
-		pid = fork();
-		if (pid == 0 && execve(arg[0], arg, environ) == -1)
-		{
-			perror(av[0]);
-			return;
-		}
-		wait(&status);
+		free_arg(a->args);
+		a->args = _strtok(a->s, a->seq);
+		args_loop(a);
 	}
 }
 
 /**
  * built_in - ex built in fun
  *
- * @env: env linked list
  * @arg: comands and thir args
- * @ali: alias list
- * @n: last exit value
+ * @a: pointer to all struct
  *
  * Return: 1 if built in 0 otehr wise
  */
-int built_in(node **env, char **arg, char ***ali, int n)
+int built_in(char **arg, all_t *a)
 {
-	var(arg, *env, *ali, n);
+	var(arg, a->env, a->ali, a->status);
+	if (!arg[0])
+		return (1);
 	if (_strcmp(arg[0], "exit") == 0)
 	{
-		exit_with(arg[1]);
+		exit_with(arg[1], a);
 		return (1);
 	}
-	if (_strcmp(arg[0], "env") == 0 && print_env(*env))
+	if (_strcmp(arg[0], "env") == 0 && print_env(a->env))
 		return (1);
-	if (_strcmp(arg[0], "cd") == 0 && cd(env, arg[1]))
+	if (_strcmp(arg[0], "cd") == 0 && cd(arg[1], a))
 		return (1);
-	if (_strcmp(arg[0], "alias") == 0 && alias(env, &arg[1], ali))
+	if (_strcmp(arg[0], "alias") == 0 && alias(&a->env, &arg[1], &a->ali))
 		return (1);
 	if (_strcmp(arg[0], "setenv") == 0)
 	{
 		if (arg[1] && arg[2])
-			_setenv(env, arg[1], arg[2]);
-		else
-			write(STDOUT_FILENO, "wrong usage\n", 12);
+			_setenv(&a->env, arg[1], arg[2]);
 		return (1);
 	}
-	else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1], env))
+	else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1], &a->env))
 		return (1);
 
 	return (0);
@@ -120,8 +80,6 @@ void print_err(char *name, int n, char *com)
 	char *s, *tmp1 = malloc(n / 10 + 3), *tmp2;
 
 
-	if (!com)
-		com = _strdup("water");
 	s = str_concat(name, ": ");
 	nto_string(n, tmp1);
 	tmp2 = str_concat(s, tmp1);
@@ -137,10 +95,9 @@ void print_err(char *name, int n, char *com)
 	else
 		tmp1 = str_concat(s, ": not found\n");
 
-	write(STDERR_FILENO, tmp1, len(tmp1));
+	write(STDERR_FILENO, tmp1, len(tmp1) - 1);
 	free(tmp1);
 	free(s);
-	free(com);
 }
 
 
@@ -152,27 +109,19 @@ void print_err(char *name, int n, char *com)
  */
 void nto_string(int n, char *s)
 {
-	int i, l = 1;
-	if (n < 10)
+	int i, tmp = n, l = 0;
+
+	while (tmp / 10 != 0)
 	{
-		s[0] = n + '0';
-		s[1] = '\0';
+		tmp /= 10;
+		l++;
 	}
-	else
+
+	s[l + 1] = '\0';
+
+	for (i = l ; i >= 0; i--)
 	{
-		for (i = 0; n / l >= 10; i++)
-		{
-			l *= 10;
-		}
-		s[0] = n / l  + '0';
-		if (n / 100 != 0 && n % 100 < 10)
-		{
-			s[1] = '0';
-			nto_string(n % l, &s[2]);
-		}
-		else
-		{
-			nto_string(n % l, &s[1]);
-		}
+		s[i] = n % 10 + '0';
+		n /= 10;
 	}
 }

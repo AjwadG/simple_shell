@@ -4,35 +4,36 @@
 /**
  * _strtok1 - gets the tokens from string
  *
- * @str: pointer to string or NULL
- * @dilm: char to split the string on
+ * @s: pointer to string
+ * @k: index in the string
  *
  * Return: pointer to the new token
  */
-char *_strtok1(char *str, char *dilm)
+char *_strtok1(char *s, int *k)
 {
-	static char *token;
+	int i, j, h, l;
+	char *str;
 
-	int last, next = 0, i, j, c_count = 0;
-
-	if (str)
-		token = str;
-	if ((!token && !str) || !dilm)
-		return (NULL);
-	for (i = 0; token[i]; i++)
+	for (i = *k; s[i] && s[i] != '\n'; i++)
 	{
-		for (j = 0; dilm[j]; j++)
+		if (s[i] == ':')
+			continue;
+		for (j = i; s[j]; j++)
 		{
-			if (token[i] == dilm[j])
-			{
-				token[i] = '\0';
-				c_count = 0;
-			}
+			if (s[j] == '\n' || s[j] == ':')
+				break;
 		}
+		l = j - i;
+		str = malloc(l + 1);
+		for (h = 0; h < l; h++)
+		{
+			str[h] = s[i + h];
+		}
+		str[l] = '\0';
+		*k = i + l;
+		break;
 	}
-	last = next + c_count;
-	next = last;
-	return (NULL);
+	return (str);
 }
 /**
  * count_w - counts the number of words

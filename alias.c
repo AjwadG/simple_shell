@@ -90,8 +90,7 @@ char *ali_val(char **ali, char *name)
  */
 int put_alias(char *new_ali, char ***ali)
 {
-	int i, k;
-	unsigned int l = sizeof(char *);
+	int i, k, l = sizeof(char *);
 	char *tmp, *s;
 
 	if (!(*ali))
@@ -122,7 +121,7 @@ int put_alias(char *new_ali, char ***ali)
 			if (i != k && envcmp(ali[0][k], tmp))
 			{
 				for (l = 0; ali[0][k][l] != '='; l++)
-						;
+					;
 				tmp = &ali[0][k][l + 1];
 				s = build_ali(ali[0][i], tmp);
 				free(ali[0][i]);

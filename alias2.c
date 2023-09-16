@@ -4,7 +4,7 @@
 /**
  * build_ali - builds ali
  * @ali: ali full value
- * @ali: only the val after =
+ * @val: only the val after =
  * Return: pointer to the value
  */
 char *build_ali(char *ali, char *val)
@@ -30,6 +30,7 @@ void print_alias(char *ali)
 {
 	int i;
 	char *tmp = malloc(len(ali) + 2);
+
 	for (i = 0; ali[i] != '='; i++)
 	{
 		tmp[i] = ali[i];
