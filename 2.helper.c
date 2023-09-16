@@ -1,5 +1,36 @@
 #include "main.h"
 
+
+/**
+ * _strtok - gets the tokens from string
+ *
+ * @str: pointer to string or NULL
+ * @dilm: char to split the string on
+ *
+ * Return: pointer to the new token
+ */
+char *_strtok(char *str, char *dilm)
+{
+	static char *token;
+
+	int last, next, i, j, c_count = 0;
+
+	if (str)
+		token = str;
+	if ((!token && !str) || !dilm)
+		return (NULL);
+	for (i = 0; token[i]; i++)
+	{
+		for (j = 0; dilm[j]; j++)
+		{
+			if (token[i] == dilm[j])
+			{
+				token[i] = '\0';
+				c_count = 0;
+			}
+		}
+	}
+}
 /**
  * count_w - counts the number of words
  *

@@ -19,7 +19,10 @@ int count_w(char *s);
 char *get_path(char *s);
 int print_env(void);
 int _getline(char **s, int *l, int stream);
-
+void exit_with(char *code);
+char *_strtok(char *str, char *dilm);
+int _setenv(char *name, char *value);
+int _unsetenv(char *env_name);
 
 
 
@@ -31,5 +34,4 @@ int _strcmp(char *s1, char *s2);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
 char *_memcpy(char *dest, char *src, unsigned int n);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
-char *_memcpy(char *dest, char *src, unsigned int n);
 #endif

@@ -28,8 +28,15 @@ void handle_terminal(char *name)
 			continue;
 		arg = get_arg(s, " \n");
 		if (_strcmp(arg[0], "exit") == 0)
-			break;
+		{
+			exit_with(arg[1]);
+			continue;
+		}
 		else if (_strcmp(arg[0], "env") == 0 && print_env())
+			continue;
+		else if (_strcmp(arg[0], "setenv") == 0 && _setenv(arg[1], arg[2]))
+			continue;
+		else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1]))
 			continue;
 		arg[0] = get_path(s);
 		if (arg[0] == NULL)
@@ -109,4 +116,11 @@ char *get_path(char *s)
 	free(path);
 	free(s);
 	return (NULL);
+}
+
+/**
+ */
+int _setenv(char *name, char *value)
+{
+	return (1);
 }
