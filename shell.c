@@ -15,21 +15,17 @@ int main(int ac, char **av, char **env)
 {
 	node *env_head;
 
+	env_head = build_env(env);
 	if (ac == 2)
 	{
-		env_head = build_env(env);
-		print_env(env_head);
-		free_env(env_head);
-		return (0);
+		handle_file(av, &env_head);
 	}
 	else if (isatty(STDIN_FILENO))
 	{
-		env_head = build_env(env);
 		handle_terminal(av[0], &env_head);
 	}
 	else
 	{
-		env_head = build_env(env);
 		handle_echo(av[0], &env_head);
 	}
 	return (EXIT_SUCCESS);

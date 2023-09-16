@@ -35,6 +35,8 @@ void handle_terminal(char *name, node **env)
 		}
 		else if (_strcmp(arg[0], "env") == 0 && print_env(*env))
 			continue;
+		else if (_strcmp(arg[0], "cd") == 0 && cd(env, arg[1]))
+			continue;
 		else if (_strcmp(arg[0], "setenv") == 0)
 		{
 			if (arg[1] && arg[2])

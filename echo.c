@@ -118,10 +118,10 @@ int _unsetenv(char *env_name, node **env)
 {
 	node *tmp = *env, *tmp1 = tmp;
 
-	if(!env_name)
+	if (!env_name)
 	{
 		write(STDOUT_FILENO, "unset wrong usage\n", 18);
-		return(1);
+		return (1);
 	}
 
 	if (envcmp(tmp->env, env_name))

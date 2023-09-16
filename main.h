@@ -24,6 +24,9 @@ extern char **environ;
 
 void handle_terminal(char *name, node **env);
 void handle_echo(char *name, node **env);
+void handle_file(char **arg, node **env);
+
+
 int isempty(char *s);
 char **get_arg(char *s, char *dil);
 int count_w(char *s);
@@ -39,6 +42,12 @@ node *build_env(char **env);
 int envcmp(char *env, char *s);
 int is_env(char *var);
 int add_node(node **head, char *env_value);
+int cd(node **env, char *dir);
+char *env_val(node *env, char *name);
+node *get_node(node *env, char *name);
+void set_env(node *env, char *value, char *name);
+
+
 
 
 char *str_concat(char *s1, char *s2);
