@@ -1,25 +1,6 @@
 #include "main.h"
-/**
- * get_arg - get the args
- *
- * @s: sting
- * @dil: dilams
- * Return: pointer to pointer of strings
- */
-char **get_arg(char *s, char *dil)
-{
-	char *token, **arg;
-	int l = count_w(s) + 1, i;
 
-	arg = malloc(sizeof(char *) * l);
-	token = strtok(s, dil);
-	for (i = 0; i < l; i++)
-	{
-		arg[i] = token;
-		token = strtok(NULL, dil);
-	}
-	return (arg);
-}
+
 /**
  * handle_echo - handles the input from echo
  * @name: name of the file
@@ -27,7 +8,7 @@ char **get_arg(char *s, char *dil)
  */
 void handle_echo(char *name, node **env)
 {
-	char *s = NULL, **arg;
+	char *s = NULL, **arg, **ali = NULL;
 	pid_t pid;
 	int status, len, size;
 
@@ -45,6 +26,10 @@ void handle_echo(char *name, node **env)
 			continue;
 		}
 		else if (_strcmp(arg[0], "env") == 0 && print_env(*env))
+			continue;
+		else if (_strcmp(arg[0], "cd") == 0 && cd(env, arg[1]))
+			continue;
+		else if (_strcmp(arg[0], "alias") == 0 && alias(env, &arg[1], &ali))
 			continue;
 		else if (_strcmp(arg[0], "setenv") == 0)
 		{
@@ -145,4 +130,27 @@ int _unsetenv(char *env_name, node **env)
 		tmp = tmp->next;
 	}
 	return (1);
+}
+
+
+/**
+ * get_arg - get the args
+ *
+ * @s: sting
+ * @dil: dilams
+ * Return: pointer to pointer of strings
+ */
+char **get_arg(char *s, char *dil)
+{
+	char *token, **arg;
+	int l = count_w(s) + 1, i;
+
+	arg = malloc(sizeof(char *) * l);
+	token = strtok(s, dil);
+	for (i = 0; i < l; i++)
+	{
+		arg[i] = token;
+		token = strtok(NULL, dil);
+	}
+	return (arg);
 }

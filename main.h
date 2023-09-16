@@ -46,7 +46,10 @@ int cd(node **env, char *dir);
 char *env_val(node *env, char *name);
 node *get_node(node *env, char *name);
 void set_env(node *env, char *value, char *name);
-
+int alias(node **env, char **arg, char ***ali);
+int put_alias(char *new_ali, char ***ali);
+char *get_alias(char *name, char **ali);
+int free_alias(char **ali);
 
 
 

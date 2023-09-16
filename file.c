@@ -4,13 +4,13 @@
 
 /**
  * handle_file - handles the input from file arg[1]
- * @arg: list of args
+ * @av: list of args
  * @env: list of envs
  */
 
 void handle_file(char **av, node **env)
 {
-	char *s = malloc(1), **arg;
+	char *s = malloc(1), **arg, **ali = NULL;
 	pid_t pid;
 	int status, len, size, fd = open(av[1], O_RDONLY);
 
@@ -41,6 +41,8 @@ void handle_file(char **av, node **env)
 		else if (_strcmp(arg[0], "env") == 0 && print_env(*env))
 			continue;
 		else if (_strcmp(arg[0], "cd") == 0 && cd(env, arg[1]))
+			continue;
+		else if (_strcmp(arg[0], "alias") == 0 && alias(env, &arg[1], &ali))
 			continue;
 		else if (_strcmp(arg[0], "setenv") == 0)
 		{

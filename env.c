@@ -71,7 +71,7 @@ int envcmp(char *env, char *s)
 
 	while (1)
 	{
-		if (env[i] == '=' && s[i] == '\0')
+		if (env[i] == '=' && (s[i] == '\0' || s[i] == '='))
 			return (1);
 		else if (env[i] == '\0')
 			return (0);

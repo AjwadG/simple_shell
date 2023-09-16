@@ -10,7 +10,7 @@
 
 void handle_terminal(char *name, node **env)
 {
-	char *s = malloc(1), **arg;
+	char *s = malloc(1), **arg, **ali = NULL;
 	pid_t pid;
 	int status, len, size;
 
@@ -36,6 +36,8 @@ void handle_terminal(char *name, node **env)
 		else if (_strcmp(arg[0], "env") == 0 && print_env(*env))
 			continue;
 		else if (_strcmp(arg[0], "cd") == 0 && cd(env, arg[1]))
+			continue;
+		else if (_strcmp(arg[0], "alias") == 0 && alias(env, &arg[1], &ali))
 			continue;
 		else if (_strcmp(arg[0], "setenv") == 0)
 		{
