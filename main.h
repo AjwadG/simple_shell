@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <signal.h>
 
 /**
  * struct list - struct
@@ -30,7 +31,7 @@ void handle_file(char **arg, node **env);
 int isempty(char *s);
 char **get_arg(char *s, char *dil);
 int count_w(char *s);
-char *get_path(char *s);
+char *get_path(char *PATH, char *s);
 int print_env(node *env);
 int _getline(char **s, int *l, int stream);
 void exit_with(char *code);
@@ -53,12 +54,29 @@ int put_alias(char *new_ali, char ***ali);
 char *get_alias(char *name, char **ali);
 int free_arr(char **ar);
 
-int *arg_num(char *s, char seq[]);
-char ***_strtok(char *s, char seq[]);
+int *arg_num(char *s, char seq[10]);
+char ***_strtok(char *s, char seq[10]);
 char *get_next_arg(char *s, int *k);
 int free_arg(char ***ar);
+int list_arr(node *env, char ***envs);
+char *ali_val(char **ali, char *name);
+char *build_ali(char *ali, char *val);
+void print_alias(char *ali);
 
-int built_in(node **env, char **arg, char ***ali);
+
+
+int built_in(node **env, char **arg, char ***ali, int n);
+void print_err(char *name, int n, char *com);
+void nto_string(int n, char *s);
+
+
+
+
+void var(char **arg, node *env, char **ali, int n);
+int handle_pid_rep(char **arg, int index);
+int handle_exit_rep(char **arg, int n, int index);
+int handle_env_rep(char **arg, node *env, int index);
+
 
 
 char *str_concat(char *s1, char *s2);

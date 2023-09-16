@@ -8,52 +8,59 @@
  */
 void handle_echo(char *name, node **env)
 {
-	char *s = NULL, **arg = NULL, ***args = NULL, **ali = NULL, seq[10];
+	char *s = malloc(1), ***args = NULL, **ali = NULL, seq[10], **envs = NULL;
 	pid_t pid;
-	int status, len, size, i;
+	int status = 0, i, count = 0;
+	size_t len, size = 0;
 
-	while (1)
+	while (++count)
 	{
-		len = _getline(&s, &size, STDIN_FILENO);
-		printf("%s \n", s);
-		if (len == 0)
+		free(s);
+		s = NULL;
+		size = 0;
+		len = getline(&s, &size, stdin);
+		if (len == 0 || len == EOF)
 		{
 			free_arg(args);
 			free_env(*env);
 			free_arr(ali);
-			return;
+			free(envs);
+			free(s);
+			exit (status != 0 ? 2 : 0);
 		}
-		if (len == EOF)
-			continue;
-		else if (isempty(s))
+		if ( isempty(s))
 			continue;
 		free_arg(args);
 		args = _strtok(s, seq);
 		for (i = 0; args[i]; i++)
 		{
-			arg = args[i];
-			if (arg[0] == NULL)
+			if (args[i][0] == NULL)
 				break;
-			if (built_in(env, arg, &ali))
+			if (built_in(env, args[i], &ali, count))
 				continue;
-			arg[0] = get_path(arg[0]);
-			if (arg[0] == NULL)
+			args[i][0] = get_path(env_val(*env, "PATH"), args[i][0]);
+			if (list_arr(*env, &envs) && args[i][0] == NULL)
 			{
-				perror(arg[0]);
-				arg[0] = malloc(1);
+				print_err(name, count, args[i][0]);
+				args[i][0] = malloc(1);
 				continue;
 			}
 			pid = fork();
-			if (pid == 0 && execve(arg[0], arg, environ) == -1)
+			if (pid == 0 && execve(args[i][0], args[i], envs) == -1)
 			{
 				perror(name);
 				free_arg(args);
 				free_env(*env);
 				free_arr(ali);
 				free(s);
-				return;
+				free(envs);
+				exit(2);
 			}
 			wait(&status);
+			if (!status && seq[i] == '|')
+				break;
+			else if (status && seq[i] == '&')
+				break;
 		}
 	}
 }
@@ -101,7 +108,7 @@ int _unsetenv(char *env_name, node **env)
 
 	if (!env_name)
 	{
-		write(STDOUT_FILENO, "unset wrong usage\n", 18);
+		write(STDERR_FILENO, "unset wrong usage\n", 18);
 		return (1);
 	}
 

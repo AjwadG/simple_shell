@@ -82,3 +82,33 @@ void set_env(node *env, char *value, char *name)
 	free(env->env);
 	env->env = str_concat(name, value);
 }
+
+
+/**
+ * list_arr - builds array fril liked list
+ * @env: env list head
+ * @envs: pointer to pointer to array
+ * Return: allways 1
+ */
+int list_arr(node *env, char ***envs)
+{
+	node *tmp = env;
+	int i;
+
+	if (*envs)
+		free(*envs);
+
+	for (i = 1; tmp; i++)
+	{
+		tmp = tmp->next;
+	}
+	*envs = malloc(sizeof(char *) * i);
+	for (i = 0, tmp = env; tmp; i++)
+	{
+		envs[0][i] = tmp->env;
+		tmp = tmp->next;
+	}
+	envs[0][i] = NULL;
+
+	return (1);
+}

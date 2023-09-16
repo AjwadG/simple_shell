@@ -93,7 +93,10 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 	{
 		newptr = malloc(new_size);
 		if (newptr)
+		{
+			free(ptr);
 			return (newptr);
+		}
 		else
 			return (NULL);
 	}
@@ -152,7 +155,6 @@ int _getline(char **s, int *l, int stream)
 	while (1)
 	{
 		stat = read(stream, &(*s)[*l - 120], 120);
-		(*s)[stat + *l - 120] = '\0';
 		if (stat == 120)
 		{
 			*l += 120;
@@ -168,6 +170,7 @@ int _getline(char **s, int *l, int stream)
 		}
 		else
 		{
+			(*s)[stat + *l - 120] = '\0';
 			return (*l - 120 + stat);
 		}
 	}

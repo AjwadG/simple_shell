@@ -54,7 +54,7 @@ void handle_file(char **av, node **env)
 		}
 		else if (_strcmp(arg[0], "unsetenv") == 0 && _unsetenv(arg[1], env))
 			continue;
-		arg[0] = get_path(s);
+		arg[0] = get_path(env_val(*env, "PATH"), arg[0]);
 		if (arg[0] == NULL)
 		{
 			perror(s);
@@ -76,11 +76,13 @@ void handle_file(char **av, node **env)
  * @env: env linked list
  * @arg: comands and thir args
  * @ali: alias list
+ * @n: last exit value
  *
  * Return: 1 if built in 0 otehr wise
  */
-int built_in(node **env, char **arg, char ***ali)
+int built_in(node **env, char **arg, char ***ali, int n)
 {
+	var(arg, *env, *ali, n);
 	if (_strcmp(arg[0], "exit") == 0)
 	{
 		exit_with(arg[1]);
@@ -104,4 +106,73 @@ int built_in(node **env, char **arg, char ***ali)
 		return (1);
 
 	return (0);
+}
+
+/**
+ * print_err - prints the error
+ *
+ * @name: name of the file
+ * @n: exe count
+ * @com: name of the comand
+ */
+void print_err(char *name, int n, char *com)
+{
+	char *s, *tmp1 = malloc(n / 10 + 3), *tmp2;
+
+
+	if (!com)
+		com = _strdup("water");
+	s = str_concat(name, ": ");
+	nto_string(n, tmp1);
+	tmp2 = str_concat(s, tmp1);
+	free(tmp1);
+	free(s);
+	tmp1 = str_concat(tmp2, ": ");
+	free(tmp2);
+	s = str_concat(tmp1, com);
+	free(tmp1);
+
+	if (len(com) > 255)
+		tmp1 = str_concat(s, ": File name too long\n");
+	else
+		tmp1 = str_concat(s, ": not found\n");
+
+	write(STDERR_FILENO, tmp1, len(tmp1));
+	free(tmp1);
+	free(s);
+	free(com);
+}
+
+
+/**
+ * nto_string - converts n to string
+ *
+ * @n: number to convert
+ * @s: string to store in
+ */
+void nto_string(int n, char *s)
+{
+	int i, l = 1;
+	if (n < 10)
+	{
+		s[0] = n + '0';
+		s[1] = '\0';
+	}
+	else
+	{
+		for (i = 0; n / l >= 10; i++)
+		{
+			l *= 10;
+		}
+		s[0] = n / l  + '0';
+		if (n / 100 != 0 && n % 100 < 10)
+		{
+			s[1] = '0';
+			nto_string(n % l, &s[2]);
+		}
+		else
+		{
+			nto_string(n % l, &s[1]);
+		}
+	}
 }

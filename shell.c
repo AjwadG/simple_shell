@@ -14,6 +14,8 @@ int main(int ac, char **av, char **env)
 {
 	node *env_head;
 
+	signal(SIGINT, SIG_IGN);
+
 	env_head = build_env(env);
 	if (ac == 2)
 	{

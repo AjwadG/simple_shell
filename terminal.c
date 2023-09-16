@@ -10,11 +10,11 @@
 
 void handle_terminal(char *name, node **env)
 {
-	char *s = NULL, **arg = NULL, ***args = NULL, **ali = NULL, seq[10];
+	char *s = NULL, ***args = NULL, **ali = NULL, seq[10], **envs = NULL;
 	pid_t pid;
-	int status, len, size, i;
+	int status, len, size, i, count = 0;
 
-	while (1)
+	while (++count)
 	{
 		write(STDOUT_FILENO, "$ ", 2);
 		len = _getline(&s, &size, STDIN_FILENO);
@@ -23,36 +23,35 @@ void handle_terminal(char *name, node **env)
 			free_arg(args);
 			free_env(*env);
 			free_arr(ali);
+			free(envs);
 			return;
 		}
-		if (len == EOF)
-			continue;
-		else if (isempty(s))
+		if (len == EOF || isempty(s))
 			continue;
 		free_arg(args);
 		args = _strtok(s, seq);
 		for (i = 0; args[i]; i++)
 		{
-			arg = args[i];
-			if (arg[0] == NULL)
+			if (args[i][0] == NULL)
 				break;
-			if (built_in(env, arg, &ali))
+			if (built_in(env, args[i], &ali, count))
 				continue;
-			arg[0] = get_path(arg[0]);
-			if (arg[0] == NULL)
+			args[i][0] = get_path(env_val(*env, "PATH"), args[i][0]);
+			if (list_arr(*env, &envs) && args[i][0] == NULL)
 			{
-				perror(arg[0]);
-				arg[0] = malloc(1);
+				print_err(name, count, args[i][0]);
+				args[i][0] = malloc(1);
 				continue;
 			}
 			pid = fork();
-			if (pid == 0 && execve(arg[0], arg, environ) == -1)
+			if (pid == 0 && execve(args[i][0], args[i], envs) == -1)
 			{
 				perror(name);
 				free_arg(args);
 				free_env(*env);
 				free_arr(ali);
 				free(s);
+				free(envs);
 				exit(1);
 			}
 			wait(&status);
@@ -68,11 +67,12 @@ void handle_terminal(char *name, node **env)
 /**
  * get_path - cheks if the comand is in path
  *
+ * @PATH: path from env
  * @s: comand as string
  *
  * Return: the full path of comand or NULL
  */
-char *get_path(char *s)
+char *get_path(char *PATH, char *s)
 {
 	char *path, *tmp, *token, *tmp1;
 	int i;
@@ -81,15 +81,8 @@ char *get_path(char *s)
 	if (stat(s, &st) == 0)
 		return (s);
 
-	for (i = 0; environ[i]; i++)
-	{
-		if (environ[i][0] == 'P' && environ[i][1] == 'A' &&
-				environ[i][2] == 'T' && environ[i][3] == 'H')
-		{
-			path = _strdup(&environ[i][5]);
-			break;
-		}
-	}
+	path = _strdup(PATH);
+
 	tmp1 = str_concat("/", s);
 	free(s);
 	s = tmp1;

@@ -11,46 +11,76 @@
  */
 int alias(node **env, char **arg, char ***ali)
 {
-	int i = 0;
+	int i;
 	char *alis;
 
-	(void) env;
-	if (!arg[0])
+	if (!arg[0] && *env)
 	{
 		if (!ali[0])
 		{
 			printf("NO ALIAS YET\n");
 			return (1);
 		}
-		while (ali[0][i])
+		for (i = 0; ali[0][i]; i++)
 		{
-			write(STDOUT_FILENO, ali[0][i], len(ali[0][i]));
-			write(STDOUT_FILENO, "\n", 1);
-			i++;
+			print_alias(ali[0][i]);
 		}
 	}
-
 	for (i = 0; arg[i]; i++)
 	{
 		if (is_env(arg[i]))
 		{
 			put_alias(arg[i], ali);
-			printf("alias : %s was addid\n", ali[0][i]);
 		}
 		else
 		{
 			alis = get_alias(arg[i], ali[0]);
 			if (!alis)
-			{
-				printf("a.out: alias: %s: not found\n", arg[i]);
 				return (1);
-			}
-			write(STDOUT_FILENO, alis, len(alis));
-			write(STDOUT_FILENO, "\n", 1);
+			print_alias(alis);
 		}
 	}
 	return (1);
 }
+
+
+/**
+ * ali_val - gets the ali of env
+ * @ali: env list head
+ * @name: name of the env
+ * Return: pointer to the value
+ */
+char *ali_val(char **ali, char *name)
+{
+	int i, j;
+
+	if (!ali)
+		return (NULL);
+	for (j = 0; name[j] != '=' && name[j]; j++)
+		;
+	if (!name[j])
+	{
+		for (i = 0; ali[i]; i++)
+		{
+			if (envcmp(ali[i], name))
+			{
+				for (j = 0; ali[i][j] != '='; j++)
+					;
+				return (&ali[i][j + 1]);
+			}
+		}
+		return (NULL);
+	}
+	for (i = 0; ali[i]; i++)
+	{
+		if (envcmp(ali[i], &name[j + 1]))
+		{
+			return (&name[j + 1]);
+		}
+	}
+	return (NULL);
+}
+
 
 /**
  * put_alias - adds a new ali
@@ -60,9 +90,9 @@ int alias(node **env, char **arg, char ***ali)
  */
 int put_alias(char *new_ali, char ***ali)
 {
-	int i = 0;
+	int i, k;
 	unsigned int l = sizeof(char *);
-	char **tmp = NULL;
+	char *tmp, *s;
 
 	if (!(*ali))
 	{
@@ -72,7 +102,7 @@ int put_alias(char *new_ali, char ***ali)
 	}
 	else
 	{
-		while (ali[0][i])
+		for (i = 0; ali[0][i]; i++)
 		{
 			if (envcmp(ali[0][i], new_ali))
 			{
@@ -80,12 +110,25 @@ int put_alias(char *new_ali, char ***ali)
 				ali[0][i] = _strdup(new_ali);
 				return (1);
 			}
-			i++;
 		}
-		tmp = _realloc(ali[0], l * (i + 1), l * (i + 2));
-		ali[0] = tmp;
-		ali[0][i++] = _strdup(new_ali);
-		ali[0][i] = NULL;
+		ali[0] = _realloc(ali[0], l * (i + 1), l * (i + 2));
+		ali[0][i] = _strdup(new_ali);
+		ali[0][i + 1] = NULL;
+		tmp = ali_val(*ali, new_ali);
+		if (tmp == NULL)
+			return (1);
+		for (k = 0; ali[0][k]; k++)
+		{
+			if (i != k && envcmp(ali[0][k], tmp))
+			{
+				for (l = 0; ali[0][k][l] != '='; l++)
+						;
+				tmp = &ali[0][k][l + 1];
+				s = build_ali(ali[0][i], tmp);
+				free(ali[0][i]);
+				ali[0][i] = s;
+			}
+		}
 	}
 	return (1);
 }

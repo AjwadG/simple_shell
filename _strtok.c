@@ -63,7 +63,6 @@ char *get_next_arg(char *s, int *k)
 		break;
 	}
 	return (str);
-
 }
 
 /**
@@ -118,7 +117,6 @@ int *arg_num(char *s, char seq[10])
 	}
 	seq[n[0] - 1] = '\0';
 	return (n);
-
 }
 
 
