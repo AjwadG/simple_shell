@@ -30,6 +30,44 @@ char ***_strtok(char *s, char seq[10])
 
 
 /**
+ * _strtok1 - gets the tokens from string
+ *
+ * @s: pointer to string
+ * @k: index in the string
+ * @dilm: char to split on
+ *
+ * Return: pointer to the new token
+ */
+char *_strtok1(char *s, int *k, char dilm)
+{
+	int i, j, h, l;
+	char *str;
+
+	for (i = *k; s[i]; i++)
+	{
+		if (s[i] == dilm)
+			continue;
+		for (j = i; s[j]; j++)
+		{
+			if (s[j] == '\n' || s[j] == dilm)
+				break;
+		}
+		l = j - i;
+		str = malloc(l + 1);
+		for (h = 0; h < l; h++)
+		{
+			str[h] = s[i + h];
+		}
+		str[l] = '\0';
+		*k = i + l;
+		break;
+	}
+	return (str);
+}
+
+
+
+/**
  * get_next_arg - get next string
  *
  * @s: source string

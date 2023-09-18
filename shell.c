@@ -1,6 +1,18 @@
 #include "main.h"
 
 /**
+ * sig_handler - handles ctrl C signal
+ * @n: signal number
+ */
+void sig_handler(int n)
+{
+	(void) n;
+	write(STDOUT_FILENO, "\n$ ", 3);
+	fflush(stdout);
+}
+
+
+/**
  * main - entry point
  *
  * @ac: number of arguments
@@ -14,32 +26,30 @@ int main(int ac, char **av, char **env)
 {
 
 	all_t a = {NULL, NULL, NULL, 0, NULL, 0, {0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0}, NULL, NULL, NULL, 0};
+		0, 0, 0, 0, 0, 0, 0}, NULL, NULL, NULL, NULL, 0};
 
-	signal(SIGINT, SIG_IGN);
 
 	a.env = build_env(env);
 	a.name = av[0];
 	if (ac == 2)
 	{
-		access(av[1], F_OK);
-		perror(av[1]);
-
 		a.fd = open(av[1], O_RDONLY);
 		if (a.fd == -1)
 		{
-			perror(av[1]);
-			return (-1);
+			file_err(&a, av[1]);
+			return (2);
 		}
-		handle_file(&a);
+		non_interactive_mode(&a);
 	}
 	else if (isatty(STDIN_FILENO))
 	{
-		handle_terminal(&a);
+		signal(SIGINT, sig_handler);
+		interactive_mode(&a);
 	}
 	else
 	{
-		handle_echo(&a);
+		non_interactive_mode(&a);
 	}
 	return (EXIT_SUCCESS);
 }
+

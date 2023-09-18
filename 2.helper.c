@@ -1,40 +1,30 @@
 #include "main.h"
 
-
 /**
- * _strtok1 - gets the tokens from string
+ * nto_string - converts n to string
  *
- * @s: pointer to string
- * @k: index in the string
- *
- * Return: pointer to the new token
+ * @n: number to convert
+ * @s: string to store in
  */
-char *_strtok1(char *s, int *k)
+void nto_string(int n, char *s)
 {
-	int i, j, h, l;
-	char *str;
+	int i, tmp = n, l = 0;
 
-	for (i = *k; s[i] && s[i] != '\n'; i++)
+	while (tmp / 10 != 0)
 	{
-		if (s[i] == ':')
-			continue;
-		for (j = i; s[j]; j++)
-		{
-			if (s[j] == '\n' || s[j] == ':')
-				break;
-		}
-		l = j - i;
-		str = malloc(l + 1);
-		for (h = 0; h < l; h++)
-		{
-			str[h] = s[i + h];
-		}
-		str[l] = '\0';
-		*k = i + l;
-		break;
+		tmp /= 10;
+		l++;
 	}
-	return (str);
+
+	s[l + 1] = '\0';
+
+	for (i = l ; i >= 0; i--)
+	{
+		s[i] = n % 10 + '0';
+		n /= 10;
+	}
 }
+
 /**
  * count_w - counts the number of words
  *
@@ -136,43 +126,25 @@ char *_memcpy(char *dest, char *src, unsigned int n)
 }
 
 /**
- * _getline - read from stream
- *
- * @s: pointer to string
- * @l: pointer to int to store the alocated memory
- * @stream: fd of reading source
- *
- * Return: Number of read chars or -1
+ * free_all - free all slocated var
+ * @a: pointer to all struct
  */
-int _getline(char **s, int *l, int stream)
+void free_all(all_t *a)
 {
-	int stat;
-	char *tmp;
-
-	if (*s)
-		free(*s);
-	*s = malloc(120);
-	*l = 120;
-	while (1)
-	{
-		stat = read(stream, &(*s)[*l - 120], 120);
-		if (stat == 120)
-		{
-			*l += 120;
-			tmp = _realloc(*s, *l - 120, *l);
-			free(*s);
-			*s = tmp;
-		}
-		else if (stat == -1 || stat == 0)
-		{
-			free(*s);
-			s = NULL;
-			return (stat);
-		}
-		else
-		{
-			(*s)[stat + *l - 120] = '\0';
-			return (*l - 120 + stat);
-		}
-	}
+	if (a->args)
+		free_arg(a->args);
+	if (a->env)
+		free_env(a->env);
+	if (a->ali)
+		free_arr(a->ali);
+	if (a->envs)
+		free(a->envs);
+	if (a->s)
+		free(a->s);
+	if (a->com)
+		free(a->com);
+	if (a->input)
+		free(a->input);
+	if (a->fd)
+		close(a->fd);
 }
