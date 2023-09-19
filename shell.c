@@ -19,7 +19,7 @@ void sig_handler(int n)
  * @av: pointer to array of args
  * @env: pointer to array of envs
  *
- * Return: 0 on success 1 or more other wise
+ * Return: 0 on success 1 or more otherwise
  */
 
 int main(int ac, char **av, char **env)
@@ -37,7 +37,7 @@ int main(int ac, char **av, char **env)
 		if (a.fd == -1)
 		{
 			file_err(&a, av[1]);
-			return (2);
+			return (127);
 		}
 		non_interactive_mode(&a);
 	}

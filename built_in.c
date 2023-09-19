@@ -4,10 +4,10 @@
 /**
  * built_in - ex built in fun
  *
- * @arg: comands and thir args
+ * @arg: commands and their args
  * @a: pointer to all struct
  *
- * Return: 1 if built in 0 otehr wise
+ * Return: 1 if built in 0 otherwise
  */
 int built_in(char **arg, all_t *a)
 {
@@ -87,11 +87,11 @@ int exit_with(char *code, all_t *a)
 /**
  * _setenv - set a new env
  *
- * @env: pointer to ehad of struct
+ * @env: pointer to the head of struct
  * @name: name of env
  * @value: value of env
  *
- * Return: allways 1
+ * Return: always 1
  */
 int _setenv(node **env, char *name, char *value)
 {
@@ -127,7 +127,7 @@ int _setenv(node **env, char *name, char *value)
  * @env_name: env name to remove
  * @env: head of env list
  *
- * Return: 1 on succes 0 other wise
+ * Return: 1 on succes 0 otherwise
  */
 int _unsetenv(char *env_name, node **env)
 {

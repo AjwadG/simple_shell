@@ -1,12 +1,12 @@
 #include "main.h"
 
 /**
- * cd - changes dir
+ * cd - changes directory
  *
  * @dir: directory to move to
  * @a: pointer to all struct
  *
- * Return: 1 on success 0 otehr wise
+ * Return: 1 on success 0 otherwise
  */
 int cd(char *dir, all_t *a)
 {
@@ -55,7 +55,7 @@ int cd(char *dir, all_t *a)
 /**
  * cd_error - prints cd errors
  *
- * @dir: name od directory
+ * @dir: name of directory
  * @a: pointer to all struct
  */
 void cd_error(char *dir, all_t *a)

@@ -40,7 +40,7 @@ void free_env(node *env_head)
 /**
  * print_env - prints linked list
  * @head: pointer to linked list
- * Return: 1 allways
+ * Return: 1 always
  */
 int print_env(node *head)
 {
@@ -62,7 +62,7 @@ int print_env(node *head)
  *
  * Description: compares two strings env and s2
  *
- * Return: 1 if they r the same 0 otehr wise
+ * Return: 1 if they are the same 0 otherwise
  */
 
 int envcmp(char *env, char *s)
@@ -83,9 +83,9 @@ int envcmp(char *env, char *s)
 }
 
 /**
- * is_env - cheks if env contains =
+ * is_env - checks if env contains =
  * @var: value of env
- * Return: 1 if it dose 0 if not
+ * Return: 1 if it does 0 if not
  */
 int is_env(char *var)
 {

@@ -3,9 +3,9 @@
 
 /**
  * add_node - add node
- * @head: head of nude
+ * @head: head of node
  * @env_value: string
- * Return: 1 success 0 otehr wise
+ * Return: 1 success 0 otherwise
  */
 int add_node(node **head, char *env_value)
 {
@@ -87,10 +87,10 @@ void set_env(node *env, char *value, char *name)
 
 
 /**
- * list_arr - builds array fril liked list
+ * list_arr - builds array from linked list
  * @env: env list head
  * @envs: pointer to pointer to array
- * Return: allways 1
+ * Return: always 1
  */
 int list_arr(node *env, char ***envs)
 {

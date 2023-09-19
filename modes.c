@@ -75,9 +75,9 @@ void non_interactive_mode(all_t *a)
 
 
 /**
- * args_loop - just to make bettey good
+ * args_loop - just to make betty good
  *
- * @a: pointer too all_t
+ * @a: pointer to all_t
  */
 void args_loop(all_t *a)
 {
@@ -121,12 +121,12 @@ void args_loop(all_t *a)
 
 
 /**
- * get_path - cheks if the comand is in path
+ * get_path - checks if the command is in path
  *
  * @PATH: path from env
- * @s: comand as string
+ * @s: command as string
  *
- * Return: the full path of comand or NULL
+ * Return: the full path of command or NULL
  */
 char *get_path(char *PATH, char *s)
 {
@@ -172,7 +172,7 @@ char *get_path(char *PATH, char *s)
  * _getline - read from stream
  *
  * @s: pointer to string
- * @l: pointer to int to store the alocated memory
+ * @l: pointer to int to store the allocated memory
  * @stream: fd of reading source
  *
  * Return: Number of read chars or -1

@@ -2,9 +2,9 @@
 
 
 /**
- * build_ali - builds ali
- * @ali: ali full value
- * @val: only the val after =
+ * build_ali - builds alias
+ * @ali: alias full value
+ * @val: only the value after =
  * Return: pointer to the value
  */
 char *build_ali(char *ali, char *val)
@@ -23,7 +23,7 @@ char *build_ali(char *ali, char *val)
 }
 
 /**
- * print_alias - prints lias format
+ * print_alias - prints alias format
  * @ali: string alias
  */
 void print_alias(char *ali)

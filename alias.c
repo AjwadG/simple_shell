@@ -4,10 +4,10 @@
  * alias - sets or prints alias
  *
  * @env: env list header
- * @arg: directory to move to
- * @ali: list of allias
+ * @arg: directory to migrate to
+ * @ali: list of all allias
  *
- * Return: 1 on success 0 otehr wise
+ * Return: 1 on success 0 otherwise
  */
 int alias(node **env, char **arg, char ***ali)
 {
@@ -45,7 +45,7 @@ int alias(node **env, char **arg, char ***ali)
 
 
 /**
- * ali_val - gets the ali of env
+ * ali_val - gets the alias of env
  * @ali: env list head
  * @name: name of the env
  * Return: pointer to the value
@@ -83,10 +83,10 @@ char *ali_val(char **ali, char *name)
 
 
 /**
- * put_alias - adds a new ali
- * @new_ali: ali to add
- * @ali: array fo alias
- * Return: allways 1
+ * put_alias - adds a new alias
+ * @new_ali: alias to add
+ * @ali: array of aliases
+ * Return: always 1
  */
 int put_alias(char *new_ali, char ***ali)
 {
@@ -136,8 +136,8 @@ int put_alias(char *new_ali, char ***ali)
 /**
  * get_alias - get the alias
  * @name: name of alias
- * @ali: array fo alias
- * Return: pointer to ali or NULL
+ * @ali: array of aliases
+ * Return: pointer to alias or NULL
  */
 char *get_alias(char *name, char **ali)
 {
@@ -158,7 +158,7 @@ char *get_alias(char *name, char **ali)
 /**
  * free_arr - frees array
  * @ar: pointer to array
- * Return: allways 1
+ * Return: always 1
  */
 int free_arr(char **ar)
 {

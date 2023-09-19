@@ -9,9 +9,8 @@
  */
 void file_err(all_t *a, char *file)
 {
-	char s[1024], *err = "cannot open ", *type;
+	char s[1024], *err = "Can't open ";
 	int l;
-	struct stat st;
 
 	_memcpy(s, a->name, len(a->name) - 1);
 	_memcpy(&s[len(a->name) - 1], ": ", 2);
@@ -21,12 +20,7 @@ void file_err(all_t *a, char *file)
 	_memcpy(&s[l - 1], err, len(err) - 1);
 	_memcpy(&s[l + len(err) - 2], file, len(file) - 1);
 	l = l + len(err) + len(file) - 3;
-	if (stat(file, &st) == 0)
-		type = ": Permission denied";
-	else
-		type = ": No such file";
-	_memcpy(&s[l], type, len(type) - 1);
-	_memcpy(&s[l + len(type) - 1], "\n", 2);
+	_memcpy(&s[l], "\n", 2);
 	write(STDERR_FILENO, s, len(s) - 1);
 	fflush(stderr);
 	a->fd = 0;
@@ -36,11 +30,11 @@ void file_err(all_t *a, char *file)
 
 
 /**
- * comand_err - prints comands errors
+ * comand_err - prints commands errors
  *
  * @name: name of the file
  * @n: exe count
- * @com: name of the comand
+ * @com: name of the command
  */
 void comand_err(char *name, int n, char *com)
 {

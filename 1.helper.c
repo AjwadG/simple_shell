@@ -2,7 +2,7 @@
 
 
 /**
- * isempty - cheks if string is empty
+ * isempty - checks if string is empty
  *
  * @s: string
  *
@@ -23,7 +23,7 @@ int isempty(char *s)
 
 
 /**
- * str_concat -  Concatenates tow strings
+ * str_concat -  Concatenates two strings
  * @s1: a pointer to a string
  * @s2: a pointer to a string
  *
@@ -31,7 +31,7 @@ int isempty(char *s)
  * contains a copy of the string str.
  *
  * Return: a pointer to new string or Null if str = NULL
- * or failed to alocate memory
+ * or failed to allocate memory
  */
 
 char *str_concat(char *s1, char *s2)
@@ -63,7 +63,7 @@ char *str_concat(char *s1, char *s2)
  *
  * Description: compares two strings s1 and s2
  *
- * Return: 0 if they r the same more or less on the defraces
+ * Return: 0 if they are the same more or less on the defraces
  */
 
 int _strcmp(char *s1, char *s2)
@@ -95,7 +95,7 @@ int _strcmp(char *s1, char *s2)
  * contains a copy of the string str.
  *
  * Return: a pointer to new string or Null if str = NULL
- * or failed to alocate memory
+ * or failed to allocate memory
  */
 
 char *_strdup(char *str)
@@ -117,7 +117,7 @@ char *_strdup(char *str)
 
 
 /**
- * len - calculates the lenght of s
+ * len - calculates the length of s
  * @s: apointer to string
  *
  * Return: the string of s or 0 if s = NULL

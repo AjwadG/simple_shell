@@ -56,14 +56,14 @@ int count_w(char *s)
 }
 
 /**
- * _realloc -  reallocates ptr to the wanted new size
+ * _realloc -  resizes ptr to the new size
  * @ptr: first number
  * @old_size: the size of ptr
- * @new_size: the new wanted size
+ * @new_size: the new specified size
  *
  *
  * Return: a pointer to the array or Null if new_size = 0 and ptr != null
- * or failed to alocate memory or ptr if old = new size
+ * or failed to allocate memory or ptr if old = new size
  */
 
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
@@ -104,7 +104,7 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 }
 
 /**
- * _memcpy - function
+ * _memcpy - copies memeory
  *
  * @dest: a pointer to the destination string.
  * @src: a poniter to the source string.
@@ -126,7 +126,7 @@ char *_memcpy(char *dest, char *src, unsigned int n)
 }
 
 /**
- * free_all - free all slocated var
+ * free_all - frees all allocated var
  * @a: pointer to all struct
  */
 void free_all(all_t *a)
